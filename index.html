@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI编码</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cosmic-blue': '#1a2b4c',
+                        'neon-red': '#ff3a3a',
+                        'neon-purple': '#a855f7',
+                        'neon-blue': '#38bdf8',
+                        'neon-green': '#22c55e',
+                        'neon-yellow': '#eab308',
+                    },
+                    fontFamily: {
+                        'future': ['Orbitron', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .glow {
+                filter: drop-shadow(0 0 8px currentColor);
+            }
+            .planet-orbit {
+                animation: orbit 30s linear infinite;
+            }
+            .planet-spin {
+                animation: spin 20s linear infinite;
+            }
+            .star-twinkle {
+                animation: twinkle 2s infinite alternate;
+            }
+        }
+    </style>
+    
+    <!-- 引入Google字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 基础样式 */
+        body {
+            overflow-x: hidden;
+            font-family: 'Orbitron', sans-serif;
+            background-color: #000;
+        }
+        
+        /* 星空背景 */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+        
+        /* 陨星动画 */
+        .meteor {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 100%);
+            border-radius: 50%;
+            transform-origin: top right;
+            z-index: -1;
+        }
+        
+        /* 动画定义 */
+        @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes twinkle {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .float-delay-1 {
+            animation: float 6s ease-in-out 1s infinite;
+        }
+        
+        .float-delay-2 {
+            animation: float 6s ease-in-out 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- 开始进入页面 -->
+    <div id="entry-page" class="fixed inset-0 flex items-center justify-center z-50 bg-black">
+        <button id="start-btn" class="px-8 py-4 text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded shadow-lg hover:scale-105 transition">开始进入</button>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="main-content" class="hidden min-h-screen relative">
+        <!-- 星空背景容器，替换为3D旋转星空 -->
+        <div id="stars-bg" class="fixed inset-0 w-full h-full z-0"></div>
+        
+        <!-- 星球导航 -->
+        <div class="container mx-auto px-4 py-16 relative h-screen flex flex-col justify-between">
+            <!-- 左上星球：个人仓库 -->
+            <div class="absolute top-20 left-10 md:top-32 md:left-20 w-24 h-24 md:w-32 md:h-32 float">
+                <div class="relative w-full h-full">
+                    <div class="absolute inset-0 rounded-full bg-neon-blue/30 border-2 border-neon-blue glow planet-spin flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-500" 
+                         data-target="repo">
+                        <i class="fa fa-github text-3xl md:text-4xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white text-center whitespace-nowrap">
+                        <span class="bg-black/60 px-2 py-1 rounded text-sm">个人仓库</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右上星球：个人中心 -->
+            <div class="absolute top-20 right-10 md:top-32 md:right-20 w-24 h-24 md:w-32 md:h-32 float-delay-1">
+                <div class="relative w-full h-full">
+                    <div class="absolute inset-0 rounded-full bg-neon-purple/30 border-2 border-neon-purple glow planet-spin flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-500"
+                         data-target="profile">
+                        <i class="fa fa-user text-3xl md:text-4xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white text-center whitespace-nowrap">
+                        <span class="bg-black/60 px-2 py-1 rounded text-sm">个人中心</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中间星球：APP制作 -->
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40">
+                <div class="relative w-full h-full">
+                    <div class="absolute inset-0 rounded-full bg-neon-green/30 border-2 border-neon-green glow planet-spin flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-500"
+                         data-target="app">
+                        <i class="fa fa-mobile text-4xl md:text-5xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white text-center whitespace-nowrap">
+                        <span class="bg-black/60 px-2 py-1 rounded text-sm">APP制作</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 左下星球：图像与视频 -->
+            <div class="absolute bottom-40 left-10 md:bottom-56 md:left-20 w-24 h-24 md:w-32 md:h-32 float-delay-2">
+                <div class="relative w-full h-full">
+                    <div class="absolute inset-0 rounded-full bg-neon-yellow/30 border-2 border-neon-yellow glow planet-spin flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-500"
+                         data-target="media">
+                        <i class="fa fa-camera text-3xl md:text-4xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white text-center whitespace-nowrap">
+                        <span class="bg-black/60 px-2 py-1 rounded text-sm">图像与视频</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右下星球：留言版 -->
+            <div class="absolute bottom-40 right-10 md:bottom-56 md:right-20 w-24 h-24 md:w-32 md:h-32 float">
+                <div class="relative w-full h-full">
+                    <div class="absolute inset-0 rounded-full bg-neon-red/30 border-2 border-neon-red glow planet-spin flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-500"
+                         data-target="message">
+                        <i class="fa fa-comments text-3xl md:text-4xl text-white"></i>
+                    </div>
+                    <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white text-center whitespace-nowrap">
+                        <span class="bg-black/60 px-2 py-1 rounded text-sm">留言版</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部文字 -->
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 border-2 border-neon-red px-6 py-2">
+                <p class="text-white text-lg font-bold">小白AI制作</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 各主题内容区域（默认隐藏） -->
+    <div id="repo-content" class="hidden fixed inset-0 bg-black/90 z-40 p-8">
+        <div class="flex justify-between items-start mb-8">
+            <h2 class="text-neon-blue text-3xl font-bold">个人仓库</h2>
+            <button class="close-btn text-white text-2xl hover:text-neon-red transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="text-white">
+            <p>这里将展示您的个人仓库内容...</p>
+        </div>
+    </div>
+    
+    <div id="profile-content" class="hidden fixed inset-0 bg-black/90 z-40 p-8">
+        <div class="flex justify-between items-start mb-8">
+            <h2 class="text-neon-purple text-3xl font-bold">个人中心</h2>
+            <button class="close-btn text-white text-2xl hover:text-neon-red transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="text-white">
+            <p>这里将展示您的个人信息...</p>
+        </div>
+    </div>
+    
+    <div id="app-content" class="hidden fixed inset-0 bg-black/90 z-40 p-8">
+        <div class="flex justify-between items-start mb-8">
+            <h2 class="text-neon-green text-3xl font-bold">APP制作</h2>
+            <button class="close-btn text-white text-2xl hover:text-neon-red transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="text-white">
+            <p>这里将展示APP制作相关内容...</p>
+        </div>
+    </div>
+    
+    <div id="media-content" class="hidden fixed inset-0 bg-black/90 z-40 p-8 overflow-auto">
+        <div class="flex justify-between items-start mb-8">
+            <h2 class="text-neon-yellow text-3xl font-bold">图像与视频</h2>
+            <button class="close-btn text-white text-2xl hover:text-neon-red transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div id="media-list" class="flex flex-wrap gap-4 overflow-x-auto" style="max-height:70vh;">
+            <!-- 动态插入图片和视频 -->
+        </div>
+        <div id="media-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+            <div class="relative bg-white rounded shadow-lg p-4">
+                <button id="close-modal" class="absolute top-2 right-2 text-black text-xl">&times;</button>
+                <div id="modal-content"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="message-content" class="hidden fixed inset-0 bg-black/90 z-40 p-8">
+        <div class="flex justify-between items-start mb-8">
+            <h2 class="text-neon-red text-3xl font-bold">留言版</h2>
+            <button class="close-btn text-white text-2xl hover:text-neon-red transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="text-white">
+            <p>这里将展示留言内容...</p>
+        </div>
+    </div>
+
+    <!-- 在 <head> 标签内加入 Three.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+    <!-- 在 <body> 最开始加入星空容器 -->
+    <div id="stars"></div>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 300;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                const size = Math.random() * 2;
+                
+                star.style.position = 'absolute';
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.backgroundColor = 'white';
+                star.style.borderRadius = '50%';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.opacity = Math.random();
+                star.style.animation = `twinkle ${Math.random() * 3 + 1}s infinite alternate`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 创建陨星
+        function createMeteor() {
+            const meteor = document.createElement('div');
+            meteor.classList.add('meteor');
+            
+            // 随机大小和位置
+            const width = Math.random() * 100 + 50;
+            const height = 2;
+            const startX = Math.random() * window.innerWidth;
+            const startY = 0;
+            
+            meteor.style.width = `${width}px`;
+            meteor.style.height = `${height}px`;
+            meteor.style.left = `${startX}px`;
+            meteor.style.top = `${startY}px`;
+            
+            // 随机角度和动画时长
+            const angle = Math.random() * 30 + 10; // 10-40度
+            const duration = Math.random() * 2 + 1; // 1-3秒
+            
+            meteor.style.transform = `rotate(${angle}deg)`;
+            meteor.style.animation = `meteor ${duration}s linear forwards`;
+            
+            document.body.appendChild(meteor);
+            
+            // 动画结束后移除陨星
+            setTimeout(() => {
+                meteor.remove();
+            }, duration * 1000);
+        }
+        
+        // 定期创建陨星
+        function startMeteorShower() {
+            setInterval(createMeteor, 1500);
+            // 初始创建几颗陨星
+            for (let i = 0; i < 3; i++) {
+                setTimeout(createMeteor, i * 500);
+            }
+        }
+        
+        // 3D旋转星空背景
+        function create3DStars() {
+            const container = document.getElementById('stars-bg');
+            container.innerHTML = '';
+            container.style.pointerEvents = 'none';
+
+            // 创建Three.js场景
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.z = 400;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // 创建星星点云
+            const starCount = 800;
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            for (let i = 0; i < starCount; i++) {
+                const r = 300 + Math.random() * 100;
+                const theta = Math.random() * 2 * Math.PI;
+                const phi = Math.acos(2 * Math.random() - 1);
+                positions.push(
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                );
+            }
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({ color: 0xffffff, size: 2 });
+            const stars = new THREE.Points(geometry, material);
+            scene.add(stars);
+
+            // 动画旋转
+            function animate() {
+                requestAnimationFrame(animate);
+                stars.rotation.y += 0.0015;
+                stars.rotation.x += 0.0005;
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // 响应窗口大小变化
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', () => {
+            create3DStars();
+            createStars();
+
+            // 进入按钮事件
+            document.getElementById('start-btn').addEventListener('click', () => {
+                const entryPage = document.getElementById('entry-page');
+                entryPage.classList.add('opacity-0', 'pointer-events-none');
+                entryPage.style.transition = 'opacity 1s ease-out';
+
+                setTimeout(() => {
+                    entryPage.classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                    startMeteorShower();
+                }, 1000);
+            });
+            
+            // 星球点击事件
+            document.querySelectorAll('[data-target]').forEach(planet => {
+                planet.addEventListener('click', () => {
+                    const target = planet.getAttribute('data-target');
+                    document.getElementById(`${target}-content`).classList.remove('hidden');
+                    // 自动加载媒体内容
+                    if (target === 'media') {
+                        loadMedia();
+                    }
+                });
+            });
+            
+            // 关闭按钮事件
+            document.querySelectorAll('.close-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btn.closest('[id$="-content"]').classList.add('hidden');
+                });
+            });
+            
+            // 添加陨星动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes meteor {
+                    from {
+                        transform: rotate(var(--angle, 20deg)) translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: rotate(var(--angle, 20deg)) translateX(calc(-100vw - 200px));
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.getElementById('start-btn').onclick = function() {
+                document.getElementById('entry-page').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            };
+        });
+        
+        // 1. 移动fetchWithTimeout函数到script标签内部并正确定义
+        // 设置fetch超时处理
+        const fetchWithTimeout = (url, options = {}, timeout = 5000) => {
+            return Promise.race([
+                fetch(url, options),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error(`请求超时: ${timeout}ms`)), timeout)
+                )
+            ]);
+        };
+
+        // 图像与视频内容自动加载
+        function loadMedia() {
+            // 显示加载中状态
+            document.getElementById('media-list').innerHTML = '<div class="text-white text-center w-full py-8">加载中...</div>';
+            
+            // 环境检测逻辑
+            const isDevEnvironment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            
+            // 确定API请求地址
+            const apiUrl = isDevEnvironment ? 'http://localhost:3000/media-list' : 'media-list.json';
+            
+            // 打印调试信息
+            console.log(`当前环境: ${isDevEnvironment ? '开发环境' : (isGitHubPages ? 'GitHub Pages环境' : '其他环境')}`);
+            console.log(`API请求地址: ${apiUrl}`);
+            
+            // 修改图片路径处理，确保在所有环境中都能正确加载
+            function getCorrectPath(filename) {
+                const encodedFilename = encodeURIComponent(filename);
+                if (isDevEnvironment) {
+                    return `/img/${encodedFilename}`;
+                } else {
+                    // 对于GitHub Pages和其他静态环境，使用相对路径
+                    return `img/${encodedFilename}`;
+                }
+            }
+            
+            // 使用带超时的fetch请求
+            fetchWithTimeout(apiUrl, {}, 5000)
+                .then(res => {
+                    // 增加了HTTP响应状态检查
+                    if (!res.ok) {
+                        throw new Error(`HTTP错误! 状态码: ${res.status}`);
+                    }
+                    return res.json().catch(err => {
+                        console.error('JSON解析错误:', err);
+                        throw new Error(`JSON解析失败: ${err.message}`);
+                    });
+                })
+                .then(data => {
+                    // 验证数据格式
+                    if (!data || typeof data !== 'object') {
+                        throw new Error('返回的数据格式不正确');
+                    }
+                    
+                    console.log(`找到图片数量: ${data.images ? data.images.length : 0}`);
+                    let html = '';
+                    if ((data.images && data.images.length) || (data.videos && data.videos.length)) {
+                        if (data.images) {
+                            data.images.forEach(img => {
+                                // 使用正确的路径处理函数
+                                const imgPath = getCorrectPath(img);
+                                html += `<img src="${imgPath}" class="media-thumb cursor-pointer rounded shadow" style="width:150px;height:150px;object-fit:cover;" alt="${img}">`;
+                            });
+                        }
+                        if (data.videos) {
+                            data.videos.forEach(video => {
+                                // 使用正确的路径处理函数
+                                const videoPath = getCorrectPath(video);
+                                html += `<video src="${videoPath}" class="media-thumb cursor-pointer rounded shadow" style="width:150px;height:150px;object-fit:cover;" muted preload="metadata"></video>`;
+                            });
+                        }
+                    } else {
+                        html = '<div class="text-white text-center w-full py-8">暂无内容</div>';
+                    }
+                    document.getElementById('media-list').innerHTML = html;
+
+                    // 添加点击事件，弹窗显示大图或视频
+                    document.querySelectorAll('.media-thumb').forEach(el => {
+                        el.onclick = function() {
+                            const modal = document.getElementById('media-modal');
+                            const modalContent = document.getElementById('modal-content');
+                            if (el.tagName === 'IMG') {
+                                modalContent.innerHTML = `<img src="${el.src}" style="max-width:80vw;max-height:80vh;">`;
+                            } else {
+                                modalContent.innerHTML = `<video src="${el.src}" controls autoplay style="max-width:80vw;max-height:80vh;"></video>`;
+                            }
+                            modal.classList.remove('hidden');
+                        };
+                    });
+                })
+                .catch(err => {
+                    // 根据不同的错误类型提供具体的提示信息和重试按钮
+                    let errorMessage = '获取失败';
+                    let debugInfo = err.message;
+                    
+                    if (err.message.includes('超时')) {
+                        errorMessage = '网络请求超时';
+                        debugInfo = '请检查您的网络连接后重试';
+                    } else if (err.message.includes('JSON解析')) {
+                        errorMessage = '数据格式错误';
+                        debugInfo = '媒体列表文件格式不正确';
+                    } else if (err.message.includes('HTTP错误')) {
+                        errorMessage = '服务器响应错误';
+                    }
+                    
+                    document.getElementById('media-list').innerHTML = `
+                        <div class="text-white text-center w-full py-8">
+                            <p>${errorMessage}: ${debugInfo}</p>
+                            <button id="retry-btn" class="mt-4 px-4 py-2 bg-neon-blue text-white rounded hover:bg-blue-600 transition">
+                                重试
+                            </button>
+                        </div>
+                    `;
+                    
+                    // 添加重试按钮事件
+                    document.getElementById('retry-btn').onclick = function() {
+                        loadMedia();
+                    };
+                });
+        }
+
+        // 关闭弹窗
+        document.addEventListener('DOMContentLoaded', () => {
+            const closeModalBtn = document.getElementById('close-modal');
+            if (closeModalBtn) {
+                closeModalBtn.onclick = function() {
+                    document.getElementById('media-modal').classList.add('hidden');
+                };
+            }
+        });
+    </script>
+</body>
+</html>
